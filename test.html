@@ -133,6 +133,92 @@
         a {
             color: #ED1C24;
         }
+
+        /* Custom Confirm Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+
+        .modal-card p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+        }
+
+        .modal-btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .modal-btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-btn-confirm {
+            background: #DC2626;
+            color: white;
+        }
+
+        .modal-btn-confirm:hover {
+            background: #B91C1C;
+        }
     </style>
 </head>
 
@@ -151,6 +237,18 @@
     <div class="progress" id="progress"></div>
     <div id="log"></div>
     <p class="warning">⚠️ Esta página es solo para pruebas internas. <a href="dashboard.html">Ir al Dashboard</a></p>
+
+    <!-- Custom Confirm Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-card">
+            <h3>🗑 ¿Eliminar todas las preguntas?</h3>
+            <p>Se borrarán TODAS las preguntas de Firebase. Esta acción no se puede deshacer.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancelar</button>
+                <button class="modal-btn modal-btn-confirm" onclick="confirmClear()">Sí, eliminar todo</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -350,14 +448,29 @@
         }
 
         function clearAll() {
-            if (confirm('¿Eliminar TODAS las preguntas de Firebase?')) {
-                db.ref('consultas').remove().then(() => {
-                    document.getElementById('progress').textContent = '🗑 Todas las preguntas eliminadas';
-                    document.getElementById('log').innerHTML = '<div style="color:#FCD34D;">Base de datos vaciada.</div>';
-                    document.getElementById('barFill').style.width = '0%';
-                });
-            }
+            document.getElementById('confirmModal').classList.add('active');
         }
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+        }
+
+        function confirmClear() {
+            closeModal();
+            db.ref('consultas').remove().then(() => {
+                document.getElementById('progress').textContent = '🗑 Todas las preguntas eliminadas';
+                document.getElementById('log').innerHTML = '<div style="color:#FCD34D;">Base de datos vaciada.</div>';
+                document.getElementById('barFill').style.width = '0%';
+            });
+        }
+
+        // Close modal on overlay click or Escape
+        document.getElementById('confirmModal').addEventListener('click', (e) => {
+            if (e.target.id === 'confirmModal') closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
     </script>
 </body>
 
