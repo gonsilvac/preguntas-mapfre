@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Envía tu consulta al expositor en las Jornadas Mapfre Global Risks">
+  <meta name="theme-color" content="#ED1C24">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Jornadas Mapfre Global Risks</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23ED1C24' rx='20' width='100' height='100'/><text y='70' x='50' text-anchor='middle' font-size='60' fill='white'>M</text></svg>">
+</head>
+
+<body>
+  <div class="bg-pattern"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="header-logo">
+        <img src="assets/AF_MAPFRE_LOGOTYPE_HOR_RGB_WHITE.svg" alt="Mapfre">
+      </div>
+      <h1 class="header-title">Jornadas Global Risks</h1>
+      <p class="header-subtitle">Envía tu consulta al expositor</p>
+    </div>
+  </header>
+
+  <!-- Form -->
+  <main class="container">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="card-title">Tu consulta</h2>
+        <p class="card-description">Completa los campos y envía tu pregunta. El expositor la recibirá en tiempo real.
+        </p>
+
+        <form id="questionForm" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="nombre">Nombre completo</label>
+            <input type="text" id="nombre" class="form-input" placeholder="Ej: Juan Pérez" required autocomplete="name">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="phone">Número de teléfono</label>
+            <input type="tel" id="phone" class="form-input" placeholder="Ej: +54 11 1234-5678" required
+              autocomplete="tel">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="consulta">Escriba su consulta para el expositor</label>
+            <textarea id="consulta" class="form-textarea" placeholder="Escribe tu pregunta aquí..." required></textarea>
+          </div>
+
+          <button type="submit" id="submitBtn" class="btn btn-primary">
+            <span class="btn-text">Enviar consulta</span>
+            <div class="spinner"></div>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p>Jornadas Mapfre Global Risks &copy; 2026</p>
+    </footer>
+  </main>
+
+  <!-- Success Overlay -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-card">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+          stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      </div>
+      <h3 class="success-title">¡Consulta enviada!</h3>
+      <p class="success-text">Tu pregunta ha sido recibida. El expositor la verá en pantalla.</p>
+      <button class="success-btn" id="closeSuccess">Enviar otra consulta</button>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/form.js"></script>
+</body>
+
+</html>

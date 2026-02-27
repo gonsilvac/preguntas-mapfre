@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard del expositor - Jornadas Mapfre Global Risks">
+    <meta name="theme-color" content="#ED1C24">
+    <title>Dashboard Expositor - Jornadas Mapfre Global Risks</title>
+    <link rel="stylesheet" href="css/styles.css?v=5">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23ED1C24' rx='20' width='100' height='100'/><text y='70' x='50' text-anchor='middle' font-size='60' fill='white'>M</text></svg>">
+</head>
+
+<body class="dashboard">
+    <div class="bg-pattern"></div>
+
+    <!-- Access PIN Overlay -->
+    <div class="access-overlay" id="accessOverlay">
+        <div class="access-card">
+            <div class="access-logo">
+                <img src="assets/AF_MAPFRE_LOGOTYPE_HOR_RGB_RED.svg" alt="Mapfre">
+            </div>
+            <h2 class="access-title">Dashboard del Expositor</h2>
+            <p class="access-subtitle">Ingresa el PIN de acceso para continuar</p>
+            <input type="password" class="access-input" id="accessKeyInput" placeholder="••••" autocomplete="off"
+                inputmode="numeric" maxlength="10">
+            <button class="access-btn" id="accessKeyBtn">Ingresar</button>
+            <p class="access-error-msg" id="accessError">PIN incorrecto. Intenta de nuevo.</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-logo">
+                <img src="assets/AF_MAPFRE_LOGOTYPE_HOR_RGB_WHITE.svg" alt="Mapfre">
+            </div>
+            <h1 class="header-title">Dashboard del Expositor</h1>
+            <p class="header-subtitle">Jornadas Global Risks &bull; Consultas en tiempo real</p>
+        </div>
+    </header>
+
+    <!-- Dashboard Layout: QR Sidebar + Main Content -->
+    <div class="dashboard-layout">
+
+        <!-- QR Sidebar (left) -->
+        <aside class="qr-sidebar">
+            <div class="qr-sidebar-inner">
+                <div class="qr-sidebar-label">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
+                        <rect x="14" y="14" width="3" height="3" />
+                        <rect x="19" y="14" width="2" height="2" />
+                        <rect x="14" y="19" width="2" height="2" />
+                        <rect x="19" y="19" width="2" height="2" />
+                    </svg>
+                    Escanea para realizar preguntas
+                </div>
+                <div class="qr-sidebar-frame" id="qrFrame" title="Clic para ampliar">
+                    <div class="qr-placeholder" id="qrPlaceholder">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                            <rect x="14" y="14" width="3" height="3" />
+                            <rect x="19" y="14" width="2" height="2" />
+                            <rect x="14" y="19" width="2" height="2" />
+                            <rect x="19" y="19" width="2" height="2" />
+                        </svg>
+                        <span>Coloca tu QR en<br><code>assets/qr.png</code></span>
+                    </div>
+                    <img src="assets/qr.png" alt="QR Code" class="qr-sidebar-img" id="qrImage"
+                        onerror="this.style.display='none'; document.getElementById('qrPlaceholder').style.display='flex';"
+                        onload="this.style.display='block'; document.getElementById('qrPlaceholder').style.display='none';">
+                </div>
+                <p class="qr-sidebar-hint">Proyecta esta pantalla para que el público pueda escanear</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" data-tab="tab-live" id="tabLive">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="vertical-align: -2px; margin-right: 4px;">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    Preguntas en vivo
+                </button>
+                <button class="tab" data-tab="tab-data" id="tabData">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="vertical-align: -2px; margin-right: 4px;">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                    </svg>
+                    Datos y exportación
+                </button>
+            </div>
+
+            <!-- Tab: Live Questions -->
+            <div class="tab-content active" id="tab-live">
+                <div class="dashboard-toolbar">
+                    <div class="dashboard-stats">
+                        <div class="stat-badge">
+                            <span class="dot"></span>
+                            En vivo
+                        </div>
+                        <div class="stat-badge">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                            </svg>
+                            <span id="questionCount">0</span> consultas
+                        </div>
+                        <button class="btn-action btn-action-red" id="randomBtn" title="Seleccionar consulta al azar">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="16 3 21 3 21 8" />
+                                <line x1="4" y1="20" x2="21" y2="3" />
+                                <polyline points="21 16 21 21 16 21" />
+                                <line x1="15" y1="15" x2="21" y2="21" />
+                                <line x1="4" y1="4" x2="9" y2="9" />
+                            </svg>
+                            Al azar
+                        </button>
+                    </div>
+                    <div class="dashboard-actions-right">
+                        <button class="btn-action btn-action-danger" id="resetBtn"
+                            title="Reiniciar todas las consultas">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path
+                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                            Reiniciar todo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="search-bar">
+                    <svg class="search-bar-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input type="text" class="search-bar-input" id="searchInput"
+                        placeholder="Buscar por nombre o contenido de la consulta...">
+                    <button class="search-bar-clear" id="searchClear" style="display:none;" title="Limpiar búsqueda">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-state-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="empty-state-title">Esperando consultas...</h3>
+                    <p class="empty-state-text">Las preguntas del público aparecerán aquí en tiempo real.</p>
+                </div>
+
+                <!-- Questions Feed -->
+                <div class="questions-feed" id="questionsFeed">
+                    <!-- Questions will be added dynamically -->
+                </div>
+            </div>
+
+            <!-- Tab: Data & Export -->
+            <div class="tab-content" id="tab-data">
+                <div class="dashboard-toolbar">
+                    <div class="dashboard-stats">
+                        <div class="stat-badge">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                            </svg>
+                            Todas las respuestas con datos de contacto
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" id="exportBtn">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Descargar Excel
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="data-table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nombre</th>
+                                    <th>Teléfono</th>
+                                    <th>Consulta</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <p>Jornadas Mapfre Global Risks &copy; 2026</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Question Popup Overlay -->
+    <div class="question-popup-overlay" id="questionPopup">
+        <div class="question-popup">
+            <button class="question-popup-close" id="closePopup">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+            <div class="question-popup-badge" id="popupBadge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                <span id="popupBadgeText">Consulta #1</span>
+            </div>
+            <p class="question-popup-text" id="popupText"></p>
+            <p class="question-popup-author" id="popupAuthor"></p>
+        </div>
+    </div>
+
+    <!-- Confirm Dialog -->
+    <div class="confirm-overlay" id="confirmOverlay">
+        <div class="confirm-card">
+            <div class="confirm-icon" id="confirmIcon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+            </div>
+            <h3 class="confirm-title" id="confirmTitle">¿Confirmar acción?</h3>
+            <p class="confirm-text" id="confirmText">Esta acción no se puede deshacer.</p>
+            <div class="confirm-pin-group" id="confirmPinGroup" style="display:none;">
+                <label class="form-label">Ingresa el PIN para confirmar</label>
+                <input type="password" class="access-input" id="confirmPinInput" placeholder="••••" inputmode="numeric"
+                    maxlength="10">
+                <p class="access-error-msg" id="confirmPinError">PIN incorrecto</p>
+            </div>
+            <div class="confirm-buttons">
+                <button class="confirm-btn-cancel" id="confirmCancel">Cancelar</button>
+                <button class="confirm-btn-ok" id="confirmOk">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Fullscreen Popup -->
+    <div class="qr-fullscreen-overlay" id="qrFullscreen">
+        <button class="qr-fullscreen-close" id="qrFullscreenClose">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+        </button>
+        <div class="qr-fullscreen-content">
+            <p class="qr-fullscreen-label">Escanea el código QR para enviar tu pregunta</p>
+            <div class="qr-fullscreen-frame">
+                <img src="assets/qr.png" alt="QR Code" class="qr-fullscreen-img" id="qrFullscreenImg">
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" title="Volver arriba">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <polyline points="18 15 12 9 6 15" />
+        </svg>
+    </button>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <!-- SheetJS for Excel export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script src="js/firebase-config.js?v=4"></script>
+    <script src="js/dashboard.js?v=4"></script>
+</body>
+
+</html>

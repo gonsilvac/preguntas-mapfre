@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Carga - Mapfre Q&A</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, sans-serif;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #aaa;
+            margin-bottom: 28px;
+        }
+
+        .count {
+            color: #ED1C24;
+            font-weight: bold;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        button {
+            padding: 16px 32px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-start {
+            background: #ED1C24;
+            color: white;
+            box-shadow: 0 4px 14px rgba(237, 28, 36, 0.4);
+        }
+
+        .btn-start:hover {
+            background: #C41018;
+            transform: translateY(-1px);
+        }
+
+        .btn-start:disabled {
+            background: #555;
+            cursor: wait;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .btn-clear {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-clear:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .progress {
+            margin: 20px 0;
+            font-size: 1.5rem;
+            color: #10B981;
+            min-height: 40px;
+        }
+
+        .bar-wrap {
+            max-width: 500px;
+            margin: 0 auto 24px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ED1C24, #FF6B6B);
+            border-radius: 10px;
+            transition: width 0.2s;
+        }
+
+        #log {
+            text-align: left;
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 0.8rem;
+            color: #888;
+            max-height: 400px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        #log div {
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .warning {
+            color: #FCD34D;
+            font-size: 0.85rem;
+            margin-top: 20px;
+        }
+
+        a {
+            color: #ED1C24;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔥 Prueba de Carga — Mapfre Q&A</h1>
+    <p class="subtitle">Enviará <span class="count">100 preguntas</span> a Firebase en ráfagas simultáneas</p>
+
+    <div class="controls">
+        <button class="btn-start" id="startBtn" onclick="startLoadTest()">🚀 Iniciar Prueba (100 preguntas)</button>
+        <button class="btn-clear" onclick="clearAll()">🗑 Limpiar todas</button>
+    </div>
+
+    <div class="bar-wrap">
+        <div class="bar-fill" id="barFill"></div>
+    </div>
+    <div class="progress" id="progress"></div>
+    <div id="log"></div>
+    <p class="warning">⚠️ Esta página es solo para pruebas internas. <a href="dashboard.html">Ir al Dashboard</a></p>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbDnwI3LJ1rTAOgYeorSmeXhBAsmm1BbQ",
+            authDomain: "preguntas-mapfre.firebaseapp.com",
+            databaseURL: "https://preguntas-mapfre-default-rtdb.firebaseio.com",
+            projectId: "preguntas-mapfre",
+            storageBucket: "preguntas-mapfre.firebasestorage.app",
+            messagingSenderId: "668179710134",
+            appId: "1:668179710134:web:667fc42cda4efa2357e617"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        const nombres = [
+            "María García", "Juan Pérez", "Ana Rodríguez", "Carlos López", "Laura Martínez",
+            "Diego Fernández", "Sofía Sánchez", "Miguel Ramírez", "Isabella Torres", "Andrés Morales",
+            "Valentina Díaz", "Sebastián Castro", "Camila Herrera", "Daniel Vargas", "Paula Jiménez",
+            "Nicolás Mendoza", "Lucía Romero", "Alejandro Navarro", "Gabriela Flores", "Mateo Cruz",
+            "Daniela Reyes", "Emilio Ortega", "Catalina Salazar", "Felipe Guerrero", "Mariana Ríos",
+            "Santiago Silva", "Valeria Medina", "Tomás Aguilar", "Renata Peña", "Joaquín Vega",
+            "Antonella Pacheco", "Lucas Delgado", "Victoria Molina", "Maximiliano Rojas", "Elena Cabrera",
+            "Ignacio Espinoza", "Natalia Fuentes", "Rafael Córdoba", "Carolina Miranda", "Adrián Guzmán",
+            "Andrea Contreras", "Pedro Ruiz", "Lorena Sandoval", "Roberto Campos", "Patricia Acosta",
+            "Fernando Vázquez", "Beatriz León", "Oscar Domínguez", "Gloria Ibáñez", "Ricardo Serrano",
+            "Claudia Herrera", "Martín Soto", "Teresa Paredes", "Héctor Rivas", "Mónica Castillo",
+            "Ramón Peñaloza", "Estela Córdoba", "Gustavo Mora", "Silvia Bravo", "Enrique Vidal",
+            "Pilar Montalvo", "Rodrigo Arce", "Diana Quiroz", "Álvaro Cifuentes", "Carmen Barrientos",
+            "Luis Espino", "Rosa Maldonado", "Javier Belmonte", "Alicia Coronel", "Ernesto Durán",
+            "Norma Villegas", "César Bustos", "Inés Aldana", "Rubén Carvajal", "Marta Solís",
+            "Eduardo Bermúdez", "Susana Palacios", "Manuel Granados", "Liliana Trejo", "Francisco Ochoa",
+            "Marcela Cortés", "Arturo Valencia", "Estela Bustamante", "Raúl Galván", "Leticia Arévalo",
+            "Hugo Quintero", "Adriana Roldán", "Jorge Sepúlveda", "Verónica Luna", "Sergio Camargo",
+            "Cecilia Montero", "Germán Alfaro", "Yolanda Escobar", "Pablo Ibarra", "Noemí Calderón",
+            "Óscar Zamorano", "Marisol Henríquez", "Alberto Lara", "Graciela Tovar", "René Figueroa"
+        ];
+
+        const preguntas = [
+            "¿Cuál es la estrategia de Mapfre frente al cambio climático y los riesgos naturales?",
+            "¿Cómo se están adaptando los seguros de Global Risks a los riesgos cibernéticos emergentes?",
+            "¿Qué innovaciones tecnológicas está implementando Mapfre en la evaluación de riesgos?",
+            "¿Cuál es su visión sobre el mercado de seguros en Latinoamérica para los próximos 5 años?",
+            "¿Cómo maneja Mapfre la retención de talento en el sector asegurador?",
+            "¿Qué papel juega la inteligencia artificial en la detección de fraudes?",
+            "¿Cómo impacta la regulación ESG en las decisiones de inversión de Mapfre?",
+            "¿Cuáles son los principales desafíos del sector asegurador post-pandemia?",
+            "¿Qué productos nuevos está desarrollando Mapfre para el segmento de PYMES?",
+            "¿Cómo se integra la sostenibilidad en la cadena de valor de Mapfre?",
+            "¿Cuál es la política de Mapfre respecto a seguros paramétricos?",
+            "¿Cómo están evolucionando los seguros de responsabilidad civil en el contexto actual?",
+            "¿Qué oportunidades ve Mapfre en el mercado de seguros para energías renovables?",
+            "¿Cómo afecta la inflación global a la suscripción de riesgos?",
+            "¿Qué estrategias tiene Mapfre para la transformación digital de sus clientes corporativos?",
+            "¿Cuál es el enfoque de Mapfre en seguros de cadena de suministro?",
+            "¿Cómo evalúan los riesgos geopolíticos en las pólizas internacionales?",
+            "¿Qué avances hay en seguros embebidos y su impacto en el negocio?",
+            "¿Cuál es la posición de Mapfre sobre las criptomonedas y blockchain en seguros?",
+            "¿Cómo se están preparando para los riesgos asociados a la transición energética?",
+            "¿Qué rol juega Mapfre en la educación financiera y de seguros?",
+            "¿Cuáles son las tendencias en reaseguros que más impactan a Global Risks?",
+            "¿Cómo maneja Mapfre los siniestros catastróficos a nivel global?",
+            "¿Qué innovaciones están implementando en el proceso de reclamaciones?",
+            "¿Cuál es la estrategia de expansión de Mapfre en Asia-Pacífico?",
+            "¿Cómo ve Mapfre la evolución del seguro de automóviles con vehículos autónomos?",
+            "¿Qué medidas toma Mapfre para garantizar la ciberseguridad de los datos de clientes?",
+            "¿Cuál es su opinión sobre la consolidación del mercado asegurador global?",
+            "¿Cómo está Mapfre enfrentando los desafíos de la longevidad en seguros de vida?",
+            "¿Qué importancia tiene el análisis predictivo en la gestión de riesgos?",
+            "¿Cuáles son los principales riesgos emergentes que monitorea Mapfre actualmente?",
+            "¿Cómo se adapta Mapfre a las nuevas regulaciones de protección de datos?",
+            "¿Qué papel juega la cultura corporativa en la innovación de Mapfre?",
+            "¿Cómo evalúa Mapfre el riesgo reputacional de sus clientes corporativos?",
+            "¿Qué impacto tiene el teletrabajo en los seguros de responsabilidad patronal?",
+            "¿Cuál es la estrategia de Mapfre en seguros de salud mental laboral?",
+            "¿Cómo está Mapfre utilizando IoT para mejorar la prevención de siniestros?",
+            "¿Qué soluciones ofrece Mapfre para riesgos de interrupción de negocio?",
+            "¿Cuál es su visión sobre Open Insurance y la apertura de datos?",
+            "¿Cómo maneja Mapfre la diversificación geográfica de riesgos?",
+            "¿Qué planes tiene Mapfre para ampliar su oferta de microseguros?",
+            "¿Cómo afectan las guerras comerciales a los seguros de comercio internacional?",
+            "¿Cuál es la experiencia de Mapfre con seguros de pandemias y eventos similares?",
+            "¿Qué tecnologías disruptivas están transformando la industria aseguradora?",
+            "¿Cómo ve Mapfre el futuro de los seguros personalizados?",
+            "¿Cuál es la política de Mapfre respecto a la inversión responsable?",
+            "¿Cómo están utilizando drones y satélites en la evaluación de daños?",
+            "¿Qué estrategias tiene Mapfre para reducir su huella de carbono operativa?",
+            "¿Cuál es el enfoque de Mapfre en protección contra terrorismo y sabotaje?",
+            "¿Cómo está evolucionando el seguro marítimo con los nuevos riesgos logísticos?",
+            "¿Qué papel juegan los datos alternativos en la suscripción de riesgos de Mapfre?",
+            "¿Cómo afronta Mapfre los desafíos regulatorios en diferentes jurisdicciones?",
+            "¿Cuál es el impacto de la economía circular en los seguros de Mapfre?",
+            "¿Qué herramientas digitales ofrece Mapfre para la gestión de pólizas corporativas?",
+            "¿Cómo se prepara Mapfre para los riesgos asociados al metaverso y realidad virtual?",
+            "¿Qué experiencia tiene Mapfre en seguros para infraestructura crítica?",
+            "¿Cuál es la estrategia de Mapfre en materia de inclusión financiera?",
+            "¿Cómo evalúa Mapfre los riesgos de la cadena de valor extendida?",
+            "¿Qué impacto tiene la electrificación del transporte en las pólizas de Mapfre?",
+            "¿Cómo está Mapfre innovando en seguros agrícolas y agropecuarios?",
+            "¿Cuál es su perspectiva sobre los seguros de crédito en el contexto actual?",
+            "¿Qué rol juega la analítica avanzada en la fijación de primas?",
+            "¿Cómo maneja Mapfre la comunicación de crisis con stakeholders?",
+            "¿Qué soluciones tiene Mapfre para riesgos ambientales y de contaminación?",
+            "¿Cómo se integra Mapfre con los ecosistemas de insurtech?",
+            "¿Cuál es la política de Mapfre para la protección de trabajadores remotos?",
+            "¿Qué perspectivas tiene Mapfre sobre seguros de inteligencia artificial?",
+            "¿Cómo gestiona Mapfre la relación con corredores y mediadores?",
+            "¿Cuál es el enfoque de Mapfre en big data para modelos actuariales?",
+            "¿Qué desafíos ve Mapfre en el cumplimiento normativo internacional?",
+            "¿Cómo está Mapfre abordando los seguros para la economía gig?",
+            "¿Cuál es la posición de Mapfre frente a los riesgos nucleares?",
+            "¿Qué innovaciones hay en la experiencia digital del cliente de Mapfre?",
+            "¿Cómo afecta la escasez de semiconductores a los seguros industriales?",
+            "¿Cuál es la estrategia de Mapfre para mercados emergentes en África?",
+            "¿Qué papel juega la telemática en los productos de seguros de Mapfre?",
+            "¿Cómo ve Mapfre el futuro de la distribución de seguros?",
+            "¿Cuáles son los KPIs clave que utiliza Global Risks para medir el éxito?",
+            "¿Qué lecciones aprendió Mapfre de los grandes siniestros recientes?",
+            "¿Cómo está Mapfre preparándose para el aumento del nivel del mar y sus impactos?",
+            "¿Qué acuerdos internacionales tiene Mapfre para la cobertura de riesgos transfronterizos?",
+            "¿Cuál es la visión de Mapfre sobre la automatización de procesos internos?",
+            "¿Cómo afronta Mapfre los riesgos derivados de la obsolescencia tecnológica?",
+            "¿Qué estrategias de retención de clientes corporativos maneja Mapfre?",
+            "¿Cuál es la postura de Mapfre sobre la regulación de IA en seguros?",
+            "¿Cómo participa Mapfre en iniciativas globales de sostenibilidad?",
+            "¿Qué oportunidades identifica Mapfre en seguros para startups y scaleups?",
+            "¿Cómo impacta el envejecimiento poblacional en los productos de Mapfre?",
+            "¿Cuál es el plan de Mapfre para la transformación del talento interno?",
+            "¿Qué alianzas estratégicas tiene Mapfre para ampliar su red global?",
+            "¿Cómo está Mapfre utilizando gemelos digitales en la gestión de riesgos?",
+            "¿Cuál es la experiencia de Mapfre con seguros de responsabilidad de directivos?",
+            "¿Qué soluciones ofrece Mapfre para la gestión de riesgos de terceros?",
+            "¿Cómo maneja Mapfre los riesgos asociados a la biodiversidad?",
+            "¿Cuáles son las prioridades de inversión tecnológica de Mapfre para 2027?",
+            "¿Cómo ve Mapfre la convergencia entre seguros y servicios financieros?",
+            "¿Qué mecanismos tiene Mapfre para manejar riesgos sistémicos?",
+            "¿Cuál es el impacto de las sanciones internacionales en las operaciones de Mapfre?",
+            "¿Cómo está Mapfre avanzando en la personalización de la experiencia del cliente?",
+            "¿Qué perspectivas tiene Mapfre sobre el seguro embebido en plataformas digitales?"
+        ];
+
+        const tel = () => '+' + (Math.floor(Math.random() * 90) + 10) + ' ' +
+            Math.floor(Math.random() * 900 + 100) + ' ' +
+            Math.floor(Math.random() * 900 + 100) + ' ' +
+            Math.floor(Math.random() * 9000 + 1000);
+
+        let sent = 0;
+        const total = 100;
+
+        async function startLoadTest() {
+            const btn = document.getElementById('startBtn');
+            const progress = document.getElementById('progress');
+            const log = document.getElementById('log');
+            const barFill = document.getElementById('barFill');
+            btn.disabled = true;
+            btn.textContent = '⏳ Enviando...';
+            sent = 0;
+            log.innerHTML = '';
+            barFill.style.width = '0%';
+
+            const promises = [];
+            const startTime = Date.now();
+
+            for (let i = 0; i < total; i++) {
+                const delay = Math.random() * 5000; // spread over 5 seconds
+                const p = new Promise((resolve) => {
+                    setTimeout(() => {
+                        const data = {
+                            nombre: nombres[i % nombres.length],
+                            telefono: tel(),
+                            consulta: preguntas[i % preguntas.length],
+                            timestamp: Date.now(),
+                            fecha: new Date().toLocaleString('es-ES')
+                        };
+                        db.ref('consultas').push(data).then(() => {
+                            sent++;
+                            const pct = Math.round(sent / total * 100);
+                            progress.textContent = `${sent} / ${total} enviadas (${pct}%)`;
+                            barFill.style.width = pct + '%';
+                            log.innerHTML += `<div>✅ #${sent} — ${data.nombre}: "${data.consulta.substring(0, 50)}..."</div>`;
+                            log.scrollTop = log.scrollHeight;
+                            resolve();
+                        });
+                    }, delay);
+                });
+                promises.push(p);
+            }
+
+            await Promise.all(promises);
+            const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+            progress.textContent = `✅ ${total} preguntas enviadas en ${elapsed}s`;
+            btn.textContent = '✅ Completado — Clic para repetir';
+            btn.disabled = false;
+            btn.onclick = () => { location.reload(); };
+            log.innerHTML += `<div style="color:#10B981;font-weight:bold;margin-top:10px;">— Prueba completada: ${total} preguntas en ${elapsed} segundos —</div>`;
+        }
+
+        function clearAll() {
+            if (confirm('¿Eliminar TODAS las preguntas de Firebase?')) {
+                db.ref('consultas').remove().then(() => {
+                    document.getElementById('progress').textContent = '🗑 Todas las preguntas eliminadas';
+                    document.getElementById('log').innerHTML = '<div style="color:#FCD34D;">Base de datos vaciada.</div>';
+                    document.getElementById('barFill').style.width = '0%';
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>
