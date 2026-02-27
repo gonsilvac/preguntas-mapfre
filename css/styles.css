@@ -852,6 +852,27 @@ body {
   line-height: 1.4;
 }
 
+.qr-sidebar-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 14px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--mapfre-red);
+  text-decoration: none;
+  background: rgba(237, 28, 36, 0.06);
+  border: 1px solid rgba(237, 28, 36, 0.15);
+  border-radius: 100px;
+  transition: all 0.2s;
+}
+
+.qr-sidebar-link:hover {
+  background: rgba(237, 28, 36, 0.12);
+  border-color: var(--mapfre-red);
+}
+
 /* Dashboard Main */
 .dashboard-main {
   flex: 1;
